@@ -21,4 +21,4 @@ jobs:
             docker build -t n8n-connected-functions .
             docker stop n8n-connected-functions 2>/dev/null || true
             docker rm n8n-connected-functions 2>/dev/null || true
-            docker run -d --name n8n-connected-functions -p 3100:3000 n8n-connected-functions
+            docker run -d --name n8n-connected-functions -p 3100:3000 $( [ -f .env ] && echo "--env-file .env" ) n8n-connected-functions
