@@ -1,0 +1,24 @@
+name: Deploy changes to Hetzner
+on:
+  push:
+    branches: ["main"]
+jobs:
+  deploy-and-track-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run deployment on Hetzner server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USERNAME }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            cd ~/n8n-connected-functions
+            git fetch origin
+            git reset --hard origin/main
+            docker build -t n8n-connected-functions .
+            docker stop n8n-connected-functions 2>/dev/null || true
+            docker rm n8n-connected-functions 2>/dev/null || true
+            docker run -d --name n8n-connected-functions -p 3100:3000 n8n-connected-functions
